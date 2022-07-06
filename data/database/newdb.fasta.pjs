@@ -1,0 +1,22 @@
+{
+  "version": "1.2",
+  "dbname": "newdb.fasta",
+  "dbtype": "Protein",
+  "db-version": 5,
+  "description": "newdb.fasta",
+  "number-of-letters": 2379,
+  "number-of-sequences": 4,
+  "last-updated": "2022-06-23T15:37:00",
+  "number-of-volumes": 1,
+  "bytes-total": 39768,
+  "bytes-to-cache": 2512,
+  "files": [
+    "newdb.fasta.pdb",
+    "newdb.fasta.phr",
+    "newdb.fasta.pin",
+    "newdb.fasta.pot",
+    "newdb.fasta.psq",
+    "newdb.fasta.ptf",
+    "newdb.fasta.pto"
+  ]
+}
