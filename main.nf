@@ -30,6 +30,7 @@ process Iprscan {
 }
 
 workflow {
-  seqs = channel.fromPath(params.seqFile).splitFasta( by:params.fastaSubsetSize, file:true  )
-  results = Iprscan(seqs) | collectFile(storeDir: params.outputDir, name: params.dataFile)
+  channel
+    .fromPath(params.seqFile)
+    .splitFasta(by:params.fastaSubsetSize, file:true) | Iprscan | collectFile(storeDir: params.outputDir, name: params.outputFile)
 }
