@@ -23,12 +23,17 @@ Notes
 
 In order to run this workflow, you will need to download the needed data files and the RpsbProc software and map them into the docker container. These can be downloaded like so
 
-`wget ftp://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/5.51-85.0/alt/interproscan-data-5.51-85.0.tar.gz 
- wget ftp://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/5.51-85.0/alt/interproscan-data-5.51-85.0.tar.gz.md5 \
- wget https://ftp.ncbi.nlm.nih.gov/pub/mmdb/cdd/rpsbproc/RpsbProc-x64-linux.tar.gz
- md5sum -c interproscan-data-5.51-85.0.tar.gz.md5 
- tar -pxzf interproscan-data-5.51-85.0.tar.gz 
- tar -pxzf RpsbProc-x64-linux.tar.gz'
+`wget ftp://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/5.51-85.0/alt/interproscan-data-5.51-85.0.tar.gz`
+
+`wget ftp://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/5.51-85.0/alt/interproscan-data-5.51-85.0.tar.gz.md5`
+ 
+`wget https://ftp.ncbi.nlm.nih.gov/pub/mmdb/cdd/rpsbproc/RpsbProc-x64-linux.tar.gz`
+ 
+`md5sum -c interproscan-data-5.51-85.0.tar.gz.md5` 
+ 
+`tar -pxzf interproscan-data-5.51-85.0.tar.gz` 
+ 
+`tar -pxzf RpsbProc-x64-linux.tar.gz`
 
 These can then be mapped into the container in the docker runOptions in the nextflow config like so
 
