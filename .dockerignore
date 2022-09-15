@@ -1,0 +1,7 @@
+#Ignoring git folders
+.git
+
+#Ignoring data folder
+data/
+
+modules/
