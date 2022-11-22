@@ -1,5 +1,19 @@
 # Nextflow Conversion of Iprscan5Task.pm
 
+***<p align=center>Iprscan5</p>***  
+```mermaid
+flowchart TD
+    p0((Channel.fromPath))
+    p1([splitFasta])
+    p2[iprscan5:Iprscan]
+    p3([collectFile])
+    p4(( ))
+    p0 --> p1
+    p1 -->|seqs| p2
+    p2 --> p3
+    p3 --> p4
+```
+
 ### Get Started
   * Install Nextflow
     
