@@ -4,7 +4,7 @@ nextflow.enable.dsl=2
 
 process Iprscan {
   input:
-    path 'subset.fa'
+    path subsetFasta
 
   output:
     path 'outputfile'
