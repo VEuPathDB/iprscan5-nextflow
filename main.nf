@@ -10,12 +10,11 @@ if(!params.fastaSubsetSize) {
   throw new Exception("Missing params.fastaSubsetSize")
 }
 
-if(params.seqFile) {
-  seqs = Channel.fromPath( params.seqFile )
-           .splitFasta( by:params.fastaSubsetSize, file:true  )
+if(params.input) {
+  seqs = Channel.fromPath(params.input).splitFasta( by:params.fastaSubsetSize, file:true  )
 }
 else {
-  throw new Exception("Missing params.seqFile")
+  throw new Exception("Missing params.input")
 }
 
 //---------------------------------------------------------------
