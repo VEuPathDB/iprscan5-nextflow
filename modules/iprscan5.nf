@@ -1,10 +1,11 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
 
-
 process Iprscan {
   input:
     path subsetFasta
+    val clusterMode
+    val appls
 
   output:
     path 'outputfile'
@@ -15,12 +16,11 @@ process Iprscan {
       template 'noApplsLen.bash'
 }
 
-
 workflow iprscan5 {
   take:
     seqs
 
   main:
-    Iprscan(seqs) \
+    Iprscan(seqs,params.isCluster,params.appls) \
       | collectFile(storeDir: params.outputDir, name: params.outputFile)
 }
