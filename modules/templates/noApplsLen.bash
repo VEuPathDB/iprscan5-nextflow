@@ -8,7 +8,7 @@ if [ "$clusterMode" = true ]; then
 
     interproscan.sh \
       -i $subsetFasta \
-      -o outputfile \
+      -o iprscan_out.tsv \
       -f TSV \
       -iprlookup \
       -goterms \
@@ -20,7 +20,7 @@ else
 
     interproscan.sh \
       -i $subsetFasta \
-      -o outputfile \
+      -o iprscan_out.tsv \
       -f TSV \
       -iprlookup \
       -goterms \

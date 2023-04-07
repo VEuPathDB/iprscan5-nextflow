@@ -9,7 +9,8 @@ RUN cd /bin/ \
   && tar -zxvf ncbi-blast-2.10.1+-x64-linux.tar.gz \
   && rm ncbi-blast-2.10.1+-x64-linux.tar.gz
 
-ADD /bin/interproscan.properties /opt/interproscan 
+ADD /bin/interproscan.properties /opt/interproscan
+ADD /bin/* /usr/bin/
 
 ENV PATH=/opt/interproscan/:/opt/interproscan/interproscan-5.51-85.0/:/opt/interproscan/interproscan-5.51-85.0/data/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/interproscan/bin/:/lib/jvm/java-11-openjdk-amd64/bin
 
