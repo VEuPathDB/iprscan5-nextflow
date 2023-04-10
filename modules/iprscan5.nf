@@ -2,7 +2,6 @@
 nextflow.enable.dsl=2
 
 process Iprscan {
-  publishDir "$params.outputDir"
 
   input:
     path subsetFasta
@@ -35,7 +34,13 @@ workflow iprscan5 {
     seqs
 
   main:
-    Iprscan(seqs,params.isCluster,params.appls) \
-      | collectFile() \
+    if (params.separateByAbbrev) {
+      Iprscan(seqs,params.isCluster,params.appls) \
+        | collectFile() \
         | separateByAbbrev
+    }
+    else {
+      Iprscan(seqs,params.isCluster,params.appls) \
+        | collectFile(storeDir: params.outputDir, name: 'iprscan_out.tsv') 
+    }
 }

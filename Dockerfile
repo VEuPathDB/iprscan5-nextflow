@@ -11,6 +11,8 @@ RUN cd /bin/ \
 
 ADD /bin/interproscan.properties /opt/interproscan
 ADD /bin/* /usr/bin/
+RUN cd /usr/bin/ \
+  && chmod +x *.pl
 
 ENV PATH=/opt/interproscan/:/opt/interproscan/interproscan-5.51-85.0/:/opt/interproscan/interproscan-5.51-85.0/data/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/interproscan/bin/:/lib/jvm/java-11-openjdk-amd64/bin
 
