@@ -9,7 +9,7 @@
     <import resource="freemarker-config.xml"/>
 
     <bean name="i5Version" class="java.lang.String">
-        <constructor-arg value="5.61-93.0"/>
+        <constructor-arg value="5.71-102.0"/>
     </bean>
 
     <!-- Entry hierarchy properties files (locations set in Maven properties for profile)-->
@@ -91,7 +91,7 @@
 
     <!-- ######################## Dependencies ############################  -->
     <bean id="entryHierarchyDataURLResourceId" class="org.springframework.core.io.UrlResource">
-        <constructor-arg value="file:/hps/nobackup/agb/interpro/tgrego/interproscan/build-5.61-93.0/64-bit/core/web/src/main/resources/entry_hierarchy.csv"/>
+        <constructor-arg value="file:/hps/nobackup/agb/interpro/tgrego/interproscan/build-5.71-102.0/64-bit/core/web/src/main/resources/entry_hierarchy.csv"/>
     </bean>
 
     <bean id="entryHierarchyDataClassPathResourceId" class="org.springframework.core.io.ClassPathResource">
@@ -99,7 +99,7 @@
     </bean>
 
     <bean id="entryToGoDataURLResourceId" class="org.springframework.core.io.UrlResource">
-        <constructor-arg value="file:/hps/nobackup/agb/interpro/tgrego/interproscan/build-5.61-93.0/64-bit/core/web/src/main/resources/entry_to_go.psv"/>
+        <constructor-arg value="file:/hps/nobackup/agb/interpro/tgrego/interproscan/build-5.71-102.0/64-bit/core/web/src/main/resources/entry_to_go.psv"/>
     </bean>
 
     <bean id="entryToGoDataClassPathResourceId" class="org.springframework.core.io.ClassPathResource">
