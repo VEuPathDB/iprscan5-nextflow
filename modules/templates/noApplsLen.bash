@@ -5,7 +5,7 @@ cp /opt/interproscan/interproscan.properties .
 python3 /opt/interproscan/initial_setup.py
 
 interproscan.sh \
-  -i $subsetFasta \
+  -i $subsetNoAsterisk \
   -f TSV,GFF3 \
   -iprlookup \
   -goterms \

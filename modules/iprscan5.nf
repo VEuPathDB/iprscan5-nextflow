@@ -1,10 +1,23 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
 
-process Iprscan {
+process RemoveAsterisk {
 
   input:
     path subsetFasta
+
+  output:
+    path 'subsetNoAsterisk.fa', emit: fasta
+  script:
+    """
+    sed -e 's/*//g' $subsetFasta > subsetNoAsterisk.fa
+    """
+}
+
+process Iprscan {
+
+  input:
+    path subsetNoAsterisk
     val appls
 
   output:
@@ -44,7 +57,8 @@ workflow iprscan5 {
     seqs
 
   main:
-      iprscanResults = Iprscan(seqs,params.appls) 
+      fastaNoAsterisk = RemoveAsterisk(seqs)
+      iprscanResults = Iprscan(fastaNoAsterisk,params.appls) 
       iprscanResults.tsv.collectFile(storeDir: params.outputDir, name: 'iprscan_out.tsv')
       index = indexResults(iprscanResults.gff.collectFile(),'iprscan_out.gff')
 }
