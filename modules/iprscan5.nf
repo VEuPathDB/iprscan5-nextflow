@@ -10,7 +10,7 @@ process RemoveAsterisk {
     path 'subsetNoAsterisk.fa', emit: fasta
   script:
     """
-    sed -e 's/*//g' $subsetFasta > subsetNoAsterisk.fa
+    sed -e 's/*/X/g' $subsetFasta > subsetNoAsterisk.fa
     """
 }
 
