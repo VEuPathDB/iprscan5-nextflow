@@ -2,6 +2,7 @@
 nextflow.enable.dsl=2
 
 process RemoveAsterisk {
+  container = 'veupathdb/iprscan5:v1.0.0'
 
   input:
     path subsetFasta
