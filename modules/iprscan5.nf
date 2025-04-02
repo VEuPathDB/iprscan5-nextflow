@@ -16,6 +16,7 @@ process RemoveAsterisk {
 }
 
 process Iprscan {
+  container = 'veupathdb/iprscan5:1.0.0'
 
   input:
     path subsetNoAsterisk
