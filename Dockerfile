@@ -25,6 +25,8 @@ ENV JAVA_HOME=/lib/jvm/java-11-openjdk-amd64
 
 RUN python3 setup.py -f /opt/interproscan/interproscan.properties
 
+ADD bin/* /usr/bin/
+
 WORKDIR /work
 
 

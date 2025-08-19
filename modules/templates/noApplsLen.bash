@@ -6,7 +6,7 @@ python3 /opt/interproscan/initial_setup.py
 
 interproscan.sh \
   -i $subsetNoAsterisk \
-  -f TSV,GFF3 \
+  -f TSV,GFF3,XML \
   -iprlookup \
   -goterms \
   -verbose

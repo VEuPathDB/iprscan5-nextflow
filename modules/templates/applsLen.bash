@@ -4,7 +4,7 @@ set -euo pipefail
 
 interproscan.sh \
   -i $subsetNoAsterisk \
-  -f TSV,GFF3 \
+  -f TSV,GFF3,XML \
   -iprlookup \
   -goterms \
   -verbose \
