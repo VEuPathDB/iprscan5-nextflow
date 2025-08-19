@@ -2,7 +2,7 @@
 nextflow.enable.dsl=2
 
 process RemoveAsterisk {
-  container = 'veupathdb/iprscan5:1.0.0'
+  container = 'veupathdb/iprscan5:latest'
 
   input:
     path subsetFasta
@@ -19,7 +19,7 @@ process RemoveAsterisk {
 }
 
 process Iprscan {
-  container = 'veupathdb/iprscan5:1.0.0'
+  container = 'veupathdb/iprscan5:latest'
 
   input:
     path subsetNoAsterisk
