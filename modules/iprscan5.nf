@@ -14,7 +14,7 @@ process RemoveAsterisk {
   script:
     """
     sed -e 's/*/X/g' $subsetFasta > noAsterisk.fa
-    perl reformatFasta.pl --abbrev $abbrev --taxID $taxonId --fasta noAsterisk.fa --outputFile subsetNoAsterisk.fa
+    perl /usr/bin/reformatFasta.pl --abbrev $abbrev --taxID $taxonId --fasta noAsterisk.fa --outputFile subsetNoAsterisk.fa
     """
 }
 
@@ -28,6 +28,7 @@ process Iprscan {
   output:
     path 'iprscan_out.tsv', emit: tsv
     path 'iprscan_out.gff3', emit: gff
+    path '*.xml', emit: xml
   script:
     if(params.appls.length() > 0 )
       template 'applsLen.bash'
@@ -57,6 +58,23 @@ process indexResults {
   """
 }
 
+process formatXMLResults {
+  container = 'biocontainers/tabix:v1.9-11-deb_cv1'
+
+  publishDir params.outputDir, mode: 'copy'
+
+  input:
+    path interproXml
+
+  output:
+    path 'merged.xml'
+
+  script:
+  """
+  python /usr/bin/merge_interpro_xml.py *.xml
+  """
+}
+
 workflow iprscan5 {
   take:
     seqs
@@ -65,5 +83,6 @@ workflow iprscan5 {
       fastaNoAsterisk = RemoveAsterisk(seqs,params.abbrev,params.taxonId)
       iprscanResults = Iprscan(fastaNoAsterisk,params.appls) 
       iprscanResults.tsv.collectFile(storeDir: params.outputDir, name: 'iprscan_out.tsv')
-      index = indexResults(iprscanResults.gff.collectFile(),'iprscan_out.gff')
+      indexResults(iprscanResults.gff.collectFile(),'iprscan_out.gff')
+      formatXMLResults(iprscanResults.xml.collect(),'iprscan_out.xml')
 }
