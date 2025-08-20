@@ -59,7 +59,7 @@ process indexResults {
 }
 
 process formatXMLResults {
-  container = 'biocontainers/tabix:v1.9-11-deb_cv1'
+  container = 'veupathdb/iprscan5:latest'
 
   publishDir params.outputDir, mode: 'copy'
 
