@@ -65,13 +65,14 @@ process formatXMLResults {
 
   input:
     path interproXml
+    val outputFileName
 
   output:
     path 'merged.xml'
 
   script:
   """
-  python /usr/bin/merge_interpro_xml.py *.xml
+  python3 /usr/bin/formatInterproXML.py $outputFileName
   """
 }
 
