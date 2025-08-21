@@ -64,7 +64,7 @@ process formatXMLResults {
   publishDir params.outputDir, mode: 'copy'
 
   input:
-    path interproXml
+    path 'interpro.xml'
     val outputFileName
 
   output:

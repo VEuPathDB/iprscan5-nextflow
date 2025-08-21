@@ -7,12 +7,13 @@ import sys
 def main():
     parser = argparse.ArgumentParser(description="Merge all XML files in the current directory into one XML file.")
     parser.add_argument("--out", required=True, help="Path to the output XML file")
+    parser.add_argument("--pattern", default="interpro.xml*", help="Pattern to match XML files (default: interpro.xml*)")
     args = parser.parse_args()
 
-    # Collect all XML files in current directory
-    files = sorted(glob.glob("*.xml"))
+    # Collect all matching XML files
+    files = sorted(glob.glob(args.pattern))
     if not files:
-        print("No XML files found in the current directory.", file=sys.stderr)
+        print(f"No files found matching pattern '{args.pattern}'", file=sys.stderr)
         sys.exit(1)
 
     merged_root = None
