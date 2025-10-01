@@ -2,7 +2,7 @@
 nextflow.enable.dsl=2
 
 process RemoveAsterisk {
-  container = 'veupathdb/iprscan5:latest'
+  container = 'veupathdb/iprscan5:1.2.0'
 
   input:
     path subsetFasta
@@ -19,7 +19,7 @@ process RemoveAsterisk {
 }
 
 process Iprscan {
-  container = 'veupathdb/iprscan5:latest'
+  container = 'veupathdb/iprscan5:1.2.0'
 
   input:
     path subsetNoAsterisk
@@ -59,7 +59,7 @@ process indexResults {
 }
 
 process formatXMLResults {
-  container = 'veupathdb/iprscan5:latest'
+  container = 'veupathdb/iprscan5:1.2.0'
 
   publishDir params.outputDir, mode: 'copy'
 
