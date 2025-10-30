@@ -2,7 +2,7 @@
 nextflow.enable.dsl=2
 
 process RemoveAsterisk {
-  container = 'veupathdb/iprscan5:1.2.0'
+  container = 'veupathdb/iprscan5:1.3.0'
 
   input:
     path subsetFasta
@@ -13,13 +13,12 @@ process RemoveAsterisk {
     path 'subsetNoAsterisk.fa', emit: fasta
   script:
     """
-    sed -e 's/*/X/g' $subsetFasta > noAsterisk.fa
-    perl /usr/bin/reformatFasta.pl --abbrev $abbrev --taxID $taxonId --fasta noAsterisk.fa --outputFile subsetNoAsterisk.fa
+    sed -e 's/*/X/g' $subsetFasta > subsetNoAsterisk.fa
     """
 }
 
 process Iprscan {
-  container = 'veupathdb/iprscan5:1.2.0'
+  container = 'veupathdb/iprscan5:1.3.0'
 
   input:
     path subsetNoAsterisk
@@ -28,7 +27,6 @@ process Iprscan {
   output:
     path 'iprscan_out.tsv', emit: tsv
     path 'iprscan_out.gff3', emit: gff
-    path '*.xml', emit: xml
   script:
     if(params.appls.length() > 0 )
       template 'applsLen.bash'
@@ -58,24 +56,6 @@ process indexResults {
   """
 }
 
-process formatXMLResults {
-  container = 'veupathdb/iprscan5:1.2.0'
-
-  publishDir params.outputDir, mode: 'copy'
-
-  input:
-    path 'interpro.xml'
-    val outputFileName
-
-  output:
-    path 'iprscan_out.xml'
-
-  script:
-  """
-  python3 /usr/bin/formatInterproXML.py --out $outputFileName
-  """
-}
-
 workflow iprscan5 {
   take:
     seqs
@@ -85,5 +65,4 @@ workflow iprscan5 {
       iprscanResults = Iprscan(fastaNoAsterisk,params.appls) 
       iprscanResults.tsv.collectFile(storeDir: params.outputDir, name: 'iprscan_out.tsv')
       indexResults(iprscanResults.gff.collectFile(),'iprscan_out.gff')
-      formatXMLResults(iprscanResults.xml.collect(),'iprscan_out.xml')
 }
