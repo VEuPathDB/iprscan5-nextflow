@@ -6,11 +6,10 @@ process RemoveAsterisk {
 
   input:
     path subsetFasta
-    val abbrev
-    val taxonId
 
   output:
     path 'subsetNoAsterisk.fa', emit: fasta
+
   script:
     """
     sed -e 's/*/X/g' $subsetFasta > subsetNoAsterisk.fa
@@ -61,7 +60,7 @@ workflow iprscan5 {
     seqs
 
   main:
-      fastaNoAsterisk = RemoveAsterisk(seqs,params.abbrev,params.taxonId)
+      fastaNoAsterisk = RemoveAsterisk(seqs)
       iprscanResults = Iprscan(fastaNoAsterisk,params.appls) 
       iprscanResults.tsv.collectFile(storeDir: params.outputDir, name: 'iprscan_out.tsv')
       indexResults(iprscanResults.gff.collectFile(),'iprscan_out.gff')
