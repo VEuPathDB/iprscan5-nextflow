@@ -1,32 +1,52 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
 
-
-//---------------------------------------------------------------
-// Param Checking 
-//---------------------------------------------------------------
-
-if(!params.fastaSubsetSize) {
-  throw new Exception("Missing params.fastaSubsetSize")
-}
-
-if(params.input) {
-  seqs = Channel.fromPath(params.input).splitFasta( by:params.fastaSubsetSize, file:true  )
-}
-else {
-  throw new Exception("Missing params.input")
-}
-
 //---------------------------------------------------------------
 // Includes
 //---------------------------------------------------------------
 
 include { iprscan5 } from './modules/iprscan5.nf'
+include { arbaAssign } from './modules/arbaAssign.nf'
 
 //---------------------------------------------------------------
-// Main Workflow
+// interpro 
+//---------------------------------------------------------------
+workflow interpro {
+
+    if(!params.fastaSubsetSize) {
+        throw new Exception("Missing params.fastaSubsetSize")
+    }
+
+    if(params.input) {
+        seqs = Channel.fromPath(params.input).splitFasta( by:params.fastaSubsetSize, file:true  )
+    }
+    else {
+        throw new Exception("Missing params.input")
+    }
+    iprscan5(seqs)    
+}
+
+//---------------------------------------------------------------
+// arba
+//---------------------------------------------------------------
+workflow arba {
+
+    if(params.interproResults) {
+        interproResults = Channel.fromPath(params.interproResults).splitText( by: 25000, file: true )
+    }
+    else {
+        throw new Exception("Missing params.interproResults")
+    }
+    if(!params.taxonId) {
+        throw new Exception("Missing params.taxonId")
+    }
+    arbaAssign(interproResults)        
+}
+
+//---------------------------------------------------------------
+// DEFAULT - interpro
 //---------------------------------------------------------------
 
 workflow {
-  iprscan5(seqs)
+    iprscan5(seqs)    
 }

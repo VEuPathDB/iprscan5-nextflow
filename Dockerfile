@@ -25,8 +25,7 @@ ENV JAVA_HOME=/lib/jvm/java-11-openjdk-amd64
 
 RUN python3 setup.py -f /opt/interproscan/interproscan.properties
 
-ADD bin/reformatFasta.pl /usr/bin/
-ADD bin/formatInterproXML.py /usr/bin/
+ADD bin/rulesheet.tsv /bin/
 
 WORKDIR /work
 
