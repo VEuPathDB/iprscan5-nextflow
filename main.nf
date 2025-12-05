@@ -32,7 +32,7 @@ workflow interpro {
 workflow arba {
 
     if(params.interproResults) {
-        interproResults = Channel.fromPath(params.interproResults).splitText( by: 25000, file: true )
+        interproResults = Channel.fromPath(params.interproResults)
     }
     else {
         throw new Exception("Missing params.interproResults")

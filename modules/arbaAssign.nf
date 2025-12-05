@@ -8,8 +8,8 @@ process runEDirect {
     val taxonId    
 
   output:
-    path interproResults  
-    path 'lineage.txt'
+    path 'lineage.txt'  
+    path interproResults
 
   script:
     """
@@ -21,32 +21,76 @@ process runEDirect {
     """
 }
 
-process assignArbaNames {
+process assignArbaAnnotation {
   container = 'veupathdb/iprscan5:1.3.0'
   input:
-    path interproResults
     path lineage
+    path interproResults
 
   output:
     path 'names.tsv'
+    path interproResults
 
   script:
     """
-    assignArbaNames.pl --iprscan $interproResults --arbaRules /bin/rulesheet.tsv --lineage $lineage --outputFile names.tsv
+    assignArbaNames.pl --iprscan $interproResults \
+                       --arbaRules /bin/rulesheet.tsv \
+                       --lineage $lineage \
+                       --outputFile names.tsv
     """
 }
 
-process formatResults {
+process formatArbaOutput {
   container = 'veupathdb/iprscan5:1.3.0'
   input:
     path arbaNames
+    path interproResults    
     
   output:
     path 'arbaAnnotation.tsv'
+    path interproResults, emit: interproResults    
 
   script:
     """
     formatArbaOutput.pl --arbaOutput $arbaNames --outputFile arbaAnnotation.tsv
+    """
+}
+
+process pfam {
+  container = 'veupathdb/iprscan5:1.3.0'
+  input:
+    path arbaAnnotations
+    path interproResults
+
+  output:
+    path 'pfam.tsv'
+    path arbaAnnotations    
+
+  script:
+    """
+    addPfamDescriptions.pl --iprscan $interproResults \
+                           --arbaOutput $arbaAnnotations \
+                           --outputFile pfam.tsv
+    """
+}
+
+process formatPFamAndArba {
+  container = 'veupathdb/iprscan5:1.3.0'
+  
+  publishDir "$params.outputDir", mode: "copy"
+  
+  input:
+    path pfam  
+    path arbaAnnotations
+
+  output:
+    path 'arbaAndPfamResults.tsv'
+
+  script:
+    """
+    formatAnnotationOutput.pl --arba $arbaAnnotations \
+                              --pfam $pfam \
+                              --output arbaAndPfamResults.tsv
     """
 }
 
@@ -56,7 +100,9 @@ workflow arbaAssign {
 
   main:
       lineage = runEDirect(interproResults,params.taxonId)
-      arbaNames = assignArbaNames(lineage)
-      formatResults(arbaNames) | collectFile(storeDir: params.outputDir, name: 'arbaAnnotation.tsv')
+      arbaAnnotation = assignArbaAnnotation(lineage)
+      formattedArba = formatArbaOutput(arbaAnnotation)
+      pfamAndArba = pfam(formattedArba)
+      formatPFamAndArba(pfamAndArba)
       
 }

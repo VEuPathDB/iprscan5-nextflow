@@ -19,7 +19,7 @@ open my $ARBA, '<', $arbaOutput or die "Could not open file $arbaOutput: $!";
 my %arbaHits;
 while (my $line = <$ARBA>) {
     chomp $line;
-    my ($proteinId, $desc, $type) = split /\t/, $line;
+    my ($proteinId, $desc, $type, $rule) = split /\t/, $line;
     $arbaHits{$proteinId} = 1;
 }
 close $ARBA;
@@ -34,7 +34,7 @@ while (my $line = <$IPR>) {
     chomp $line;
 
     my ($protein, $md5, $length, $analysis, $sigAcc, $sigDesc,
-        $start, $end, $score, $status, $date, $iprAcc) = split /\t/, $line;
+        $start, $end, $score, $status, $date, $iprAcc, @rest) = split /\t/, $line;
 
     # Only Pfam, and only proteins not found in ARBA
     if ($analysis eq 'Pfam') {
