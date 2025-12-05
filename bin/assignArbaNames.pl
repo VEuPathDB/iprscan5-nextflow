@@ -28,7 +28,8 @@ if (defined $first) {
         # not a header: process this line as data
         my $line = $first;
         if ($line =~ /\S/) {
-            my ($taxonField, $value_str, $name, $unirule) = split /\t/, $line;
+            my ($taxonField, $value_str, $name, $unirule, @rest) = split /\t/, $line, -1;
+	    
             if (defined $unirule) {
                 $value_str //= '';
                 my @values = map { s/^\s+|\s+$//gr } grep { length($_) } split /,/, $value_str;
@@ -40,8 +41,9 @@ if (defined $first) {
 
 while (my $line = <$ARBA>) {
     chomp $line;
+    $line =~ s/\r$//;
     next unless $line =~ /\S/;
-    my ($taxonField, $value_str, $name, $unirule) = split /\t/, $line;
+    my ($taxonField, $value_str, $name, $unirule, @rest) = split /\t/, $line, -1;
     next unless defined $unirule;            # skip malformed lines
     $value_str //= '';
     my @values = map { s/^\s+|\s+$//gr } grep { length($_) } split /,/, $value_str;   # trim whitespace
@@ -54,6 +56,7 @@ my @taxids;
 open(my $LIN, "<", $lineage) or die "Could not open lineage file $lineage: $!";
 while (<$LIN>) {
     chomp;
+    s/\r$//;
     next unless /\S/;
     push @taxids, $_;
 }
@@ -81,12 +84,15 @@ my %protein_info;
 open my $IPR, '<', $iprscan or die "Could not open file $iprscan: $!";
 while (my $line = <$IPR>) {
     chomp $line;
+    $line =~ s/\r$//;
     next unless $line =~ /\S/;
     my @cols = split /\t/, $line, -1;
 
-    # Defensive: ensure there are enough columns; original expected at least up to $iprAcc
-    # Original mapping:
     # ($protein, $md5, $length, $analysis, $sigAcc, $sigDesc, $start, $end, $score, $status, $date, $iprAcc, $iprDesc, $go, $path)
+    my ($protein, $md5, $length, $analysis, $sigAcc, $sigDesc, $start, $end, $score, $status, $date, $iprAcc, @rest) = @cols;
+
+    # If fewer than 12 columns, undef values remain undef but do not shift left
+    
     my ($protein, $md5, $length, $analysis, $sigAcc, $sigDesc, $start, $end, $score, $status, $date, $iprAcc) = @cols[0..11];
 
     next unless defined $protein and length $protein;

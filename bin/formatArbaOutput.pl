@@ -23,10 +23,10 @@ while (<$ARBA>) {
     chomp;
     my ($geneId, $desc, $rule, $analysis) = split /\t/;
 
-    # Skip if we already have the same description for this gene-analysis-rule combo
     next if exists $gene_data{$geneId}{$analysis}{$rule}{$desc};
 
     $gene_data{$geneId}{$analysis}{$rule}{$desc} = 1;
+
     push @genes_seen, $geneId unless exists $gene_data{$geneId}{_seen};
     $gene_data{$geneId}{_seen} = 1;
 }
@@ -39,38 +39,54 @@ my @priority = ('FunFam id', 'PANTHER id', 'InterPro id');
 
 foreach my $geneId (@genes_seen) {
     my $chosen_analysis;
-    my @descriptions;
+    my %unique_desc;
+    my %unique_rules;
 
-    # Select analysis to use based on priority and presence of textual description
+    # Choose analysis in priority order
     foreach my $analysis (@priority) {
-        if (exists $gene_data{$geneId}{$analysis}) {
-            # Collect all unique descriptions across all rules for this analysis
-            my %unique_desc;
-            for my $rule (keys %{$gene_data{$geneId}{$analysis}}) {
-                for my $desc (keys %{$gene_data{$geneId}{$analysis}{$rule}}) {
-                    $unique_desc{$desc} = 1;
-                }
+        next unless exists $gene_data{$geneId}{$analysis};
+
+        # Collect all descriptions and rules
+        my %desc_tmp;
+        my %rule_tmp;
+
+        foreach my $rule (keys %{$gene_data{$geneId}{$analysis}}) {
+            $rule_tmp{$rule} = 1;
+            foreach my $desc (keys %{$gene_data{$geneId}{$analysis}{$rule}}) {
+                $desc_tmp{$desc} = 1;
             }
-            # Prefer analysis that has at least one description with letters
-            my @text_desc = grep { /[A-Za-z]/ } keys %unique_desc;
-            if (@text_desc) {
-                @descriptions = @text_desc;
-                $chosen_analysis = $analysis;
-                last;
-            } else {
-                # fallback if only EC numbers present
-                @descriptions = keys %unique_desc;
-                $chosen_analysis = $analysis;
-            }
+        }
+
+        # Prefer analyses with textual descriptions
+        my @text_desc = grep { /[A-Za-z]/ } keys %desc_tmp;
+
+        if (@text_desc) {
+            %unique_desc  = map { $_ => 1 } @text_desc;
+            %unique_rules = %rule_tmp;
+            $chosen_analysis = $analysis;
+            last;
+        } else {
+            # fallback if only EC numbers
+            %unique_desc  = %desc_tmp;
+            %unique_rules = %rule_tmp;
+            $chosen_analysis = $analysis;
         }
     }
 
+    my @descriptions = sort keys %unique_desc;
+    my @rules        = sort keys %unique_rules;
+
     die "Gene $geneId has no descriptions!" unless @descriptions;
 
-    # Join unique descriptions with comma
     my $full_description = join(", ", @descriptions);
+    my $full_rules       = join(", ", @rules);
 
-    print $OUT join("\t", $geneId, $full_description, $chosen_analysis), "\n";
+    print $OUT join("\t",
+        $geneId,
+        $full_description,
+        $chosen_analysis,
+        $full_rules
+    ), "\n";
 }
 
 close $OUT;
