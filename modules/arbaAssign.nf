@@ -4,16 +4,18 @@ nextflow.enable.dsl=2
 process filterInterproByLongestProteinPerGene {
   container = 'veupathdb/iprscan5:1.3.0'
   input:
+    tuple val(abbrev), val(taxon_id)
     path interproResults
-    path proteome    
+    path proteomes    
 
   output:
     path 'filteredInterproResults.tsv'
+    tuple val(abbrev), val(taxon_id)    
 
   script:
     """
-    filterInterproByLongest.pl --fasta $proteome \
-                                    --interpro $interproResults \
+    filterInterproByLongest.pl --fasta $proteomes/${abbrev}.fsa \
+                                    --interpro $interproResults/${abbrev}_iprscan_out.tsv \
                                     --output filteredInterproResults.tsv
     """
 }
@@ -22,18 +24,19 @@ process runEDirect {
   container = 'veupathdb/edirect:1.0.0'
   input:
     path filteredInterproResults
-    val taxonId    
+    tuple val(abbrev), val(taxon_id)        
 
   output:
     path 'lineage.txt'  
     path filteredInterproResults
+    tuple val(abbrev), val(taxon_id)    
 
   script:
     """
-    efetch -db taxonomy -id $taxonId -format xml \
+    efetch -db taxonomy -id $taxon_id -format xml \
     | xtract -pattern Taxon -block LineageEx -sep "\n" -element TaxId > taxonIds.txt
     # Adds our input id to the file, as it is not
-    echo "$taxonId" >> taxonIds.txt
+    echo "$taxon_id" >> taxonIds.txt
     tac taxonIds.txt > lineage.txt
     """
 }
@@ -43,10 +46,12 @@ process assignArbaAnnotation {
   input:
     path lineage
     path filteredInterproResults
+    tuple val(abbrev), val(taxon_id)        
 
   output:
     path 'names.tsv'
-    path filteredInterproResults    
+    path filteredInterproResults
+    tuple val(abbrev), val(taxon_id)        
 
   script:
     """
@@ -62,10 +67,12 @@ process formatArbaOutput {
   input:
     path arbaNames
     path filteredInterproResults
+    tuple val(abbrev), val(taxon_id)        
     
   output:
     path 'arbaAnnotation.tsv'
-    path filteredInterproResults      
+    path filteredInterproResults
+    tuple val(abbrev), val(taxon_id)        
 
   script:
     """
@@ -78,10 +85,12 @@ process pfam {
   input:
     path arbaAnnotations
     path filteredInterproResults
+    tuple val(abbrev), val(taxon_id)        
 
   output:
     path 'pfam.tsv'
-    path arbaAnnotations    
+    path arbaAnnotations
+    tuple val(abbrev), val(taxon_id)        
 
   script:
     """
@@ -99,25 +108,26 @@ process formatPFamAndArba {
   input:
     path pfam  
     path arbaAnnotations
+    tuple val(abbrev), val(taxon_id)        
 
   output:
-    path 'arbaAndPfamResults.tsv'
+    path '*arbaAndPfamResults.tsv'
 
   script:
     """
     formatAnnotationOutput.pl --arba $arbaAnnotations \
                               --pfam $pfam \
-                              --output arbaAndPfamResults.tsv
+                              --output ${abbrev}_arbaAndPfamResults.tsv
     """
 }
 
 workflow arbaAssign {
   take:
-    interproResults
+    abbrevAndIds
 
   main:
-      filteredInterproResults = filterInterproByLongestProteinPerGene(interproResults,params.proteome) 
-      lineage = runEDirect(filteredInterproResults,params.taxonId)
+       filteredInterproResults = filterInterproByLongestProteinPerGene(abbrevAndIds,params.interproResults,params.proteomes) 
+      lineage = runEDirect(filteredInterproResults)
       arbaAnnotation = assignArbaAnnotation(lineage)
       formattedArba = formatArbaOutput(arbaAnnotation)
       pfamAndArba = pfam(formattedArba)

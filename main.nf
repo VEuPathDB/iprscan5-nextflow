@@ -31,16 +31,22 @@ workflow interpro {
 //---------------------------------------------------------------
 workflow arba {
 
-    if(params.interproResults) {
-        interproResults = Channel.fromPath(params.interproResults)
-    }
-    else {
+    if(!params.interproResults) {
         throw new Exception("Missing params.interproResults")
     }
-    if(!params.taxonId) {
-        throw new Exception("Missing params.taxonId")
+    if(!params.proteomes) {
+        throw new Exception("Missing params.proteomes")
+    }    
+    if(params.taxonIdFile) {
+        abbrevAndIds = Channel
+                           .fromPath(params.taxonIdFile)
+                           .splitCsv(sep: '\t', header: false)
+                           .map { abbrev, id -> tuple(abbrev, id as Integer) }
     }
-    arbaAssign(interproResults)        
+    else {
+        throw new Exception("Missing params.taxonIdFile")
+    }    
+    arbaAssign(abbrevAndIds)        
 }
 
 //---------------------------------------------------------------
