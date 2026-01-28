@@ -1,15 +1,32 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
 
+process filterInterproByLongestProteinPerGene {
+  container = 'veupathdb/iprscan5:1.3.0'
+  input:
+    path interproResults
+    path proteome    
+
+  output:
+    path 'filteredInterproResults.tsv'
+
+  script:
+    """
+    filterInterproByLongest.pl --fasta $proteome \
+                                    --interpro $interproResults \
+                                    --output filteredInterproResults.tsv
+    """
+}
+
 process runEDirect {
   container = 'veupathdb/edirect:1.0.0'
   input:
-    path interproResults
+    path filteredInterproResults
     val taxonId    
 
   output:
     path 'lineage.txt'  
-    path interproResults
+    path filteredInterproResults
 
   script:
     """
@@ -25,15 +42,15 @@ process assignArbaAnnotation {
   container = 'veupathdb/iprscan5:1.3.0'
   input:
     path lineage
-    path interproResults
+    path filteredInterproResults
 
   output:
     path 'names.tsv'
-    path interproResults
+    path filteredInterproResults    
 
   script:
     """
-    assignArbaNames.pl --iprscan $interproResults \
+    assignArbaNames.pl --iprscan $filteredInterproResults \
                        --arbaRules /bin/rulesheet.tsv \
                        --lineage $lineage \
                        --outputFile names.tsv
@@ -44,11 +61,11 @@ process formatArbaOutput {
   container = 'veupathdb/iprscan5:1.3.0'
   input:
     path arbaNames
-    path interproResults    
+    path filteredInterproResults
     
   output:
     path 'arbaAnnotation.tsv'
-    path interproResults, emit: interproResults    
+    path filteredInterproResults      
 
   script:
     """
@@ -60,7 +77,7 @@ process pfam {
   container = 'veupathdb/iprscan5:1.3.0'
   input:
     path arbaAnnotations
-    path interproResults
+    path filteredInterproResults
 
   output:
     path 'pfam.tsv'
@@ -68,7 +85,7 @@ process pfam {
 
   script:
     """
-    addPfamDescriptions.pl --iprscan $interproResults \
+    addPfamDescriptions.pl --iprscan $filteredInterproResults \
                            --arbaOutput $arbaAnnotations \
                            --outputFile pfam.tsv
     """
@@ -99,7 +116,8 @@ workflow arbaAssign {
     interproResults
 
   main:
-      lineage = runEDirect(interproResults,params.taxonId)
+      filteredInterproResults = filterInterproByLongestProteinPerGene(interproResults,params.proteome) 
+      lineage = runEDirect(filteredInterproResults,params.taxonId)
       arbaAnnotation = assignArbaAnnotation(lineage)
       formattedArba = formatArbaOutput(arbaAnnotation)
       pfamAndArba = pfam(formattedArba)

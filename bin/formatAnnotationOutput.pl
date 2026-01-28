@@ -80,7 +80,7 @@ for my $gene (sort keys %all_ids) {
         $ids = "Pfam:" . join(",", @ids);
     }
 
-    print $OUT join(" || ",
+    print $OUT join("\t",
         $gene,
         $desc,
         1,
